@@ -1,0 +1,11 @@
+GooglePlay Downloader - Directly download apks from GooglePlay to your PC.
+by Simone Margaritelli aka evilsocket
+<evilsocket@gmail.com - http://www.evilsocket.net>
+
+Given you GooglePlay access data and a package name, this script will generate a http
+link for you to directly download th APK file to your computer instead of installing
+it on your device.
+
+For the help menu please type:
+
+  python gplay-downloader.py --help
