@@ -290,7 +290,7 @@ class Operator:
     self.code    = Operator.OPERATORS[country][name]    
       
 class AssetRequest:
-  def __init__( self, package_name, auth_token, device_id, operator ):
+  def __init__( self, package_name, auth_token, device_id, operator, device_name, sdk_version):
     self.encode_table       = [0, [16], 2, [24], 4, [34], 6, [42], 8, [50], 10, [58], 12, [66], 14, [74], 16, [82], 18, [90], 20, [19, 82], 22, [10], 24, [20]]
     self.pad                = [ 10 ]
     self.buffer             = ProtocolBuffer()
@@ -299,7 +299,8 @@ class AssetRequest:
     self.is_secure          = True
     self.sdk_version        = 2009011
     self.device_id          = device_id
-    self.device_sdk_version = "passion:9"
+    self.device_name        = device_name
+    self.sdk_version        = sdk_version
     self.locale             = "en"
     self.country            = "us"
     self.operator_alpha     = operator.name
@@ -333,7 +334,7 @@ class AssetRequest:
           self.buffer.update( self.device_id )
             
         elif encoder ==  8:
-          self.buffer.update( self.device_sdk_version )
+          self.buffer.update( '%s:%d' % (self.device_name, self.sdk_version) )
             
         elif encoder ==  10:
           self.buffer.update( self.locale )
@@ -382,6 +383,8 @@ if __name__ == '__main__':
     parser.add_option( "-c", "--country",  action="store",  dest="country",  default=None, help="Your country.")
     parser.add_option( "-o", "--operator", action="store",  dest="operator", default=None, help="Your phone operator.")
     parser.add_option( "-d", "--device",   action="store",  dest="device",   default=None, help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
+    parser.add_option( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", default=9, help="Android SDK API level (default is 9 like Android 2.3.1).")
+    parser.add_option( "-m", "--devname",  action="store",  dest="devname",  default="passion", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
 
     (o,args) = parser.parse_args()
   
@@ -403,8 +406,10 @@ if __name__ == '__main__':
     elif o.device is None:
       print "No device id specified." 
     
-    else:
+    elif o.sdklevel < 2:
+      print "The SDK API level cannot be less than 2."
       
+    else:
       print "@ Logging in ..."
       
       market = Market( o.email, o.password )
@@ -413,7 +418,7 @@ if __name__ == '__main__':
       print "@ Requesting package ..."
   
       operator = Operator( o.country, o.operator )
-      request  = AssetRequest( o.package, market.token, o.device, operator )
+      request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
       asset    = market.get_asset( request.encode() )  
        
       print "@ Download %s from :\n  %s" % ( o.package, asset )
