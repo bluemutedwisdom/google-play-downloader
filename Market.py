@@ -1,4 +1,4 @@
-from compat import httplib_compat, urllib_compat
+from compat import httplib_compat, urllib_parse_compat
 import re, zlib
 
 class Market:
@@ -15,7 +15,7 @@ class Market:
     self.token    = None
 
   def login( self ):
-    params = urllib_compat.urlencode({
+    params = urllib_parse_compat.urlencode({
       "Email"       : self.email,
       "Passwd"      : self.password,
       "service"     : Market.LOGIN_SERVICE,
@@ -43,7 +43,7 @@ class Market:
       raise Exception( "Unexpected response." )
 
   def get_asset( self, request ):
-    params = urllib_compat.urlencode({
+    params = urllib_parse_compat.urlencode({
       "version" : 2,
       "request" : request
     })
@@ -78,6 +78,6 @@ class Market:
     else:
       dl_cookie = match.group(1)
 
-    return dl_url + "#" + dl_cookie
+    return (dl_url, dl_cookie)
 
 

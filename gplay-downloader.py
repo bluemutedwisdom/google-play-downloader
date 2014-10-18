@@ -19,20 +19,22 @@
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import optparse
+import traceback
 from Market import Market
 from Operator import Operator
 from AssetRequest import AssetRequest
+from Util import Util
 
-def main():    
+def main():
     print( "\n\tGooglePlay Downloader - Directly download apks from GooglePlay to your PC.\n" +
                "\tCopyleft Simone Margaritelli <evilsocket@evilsocket.net>\n" +
                "\thttp://www.evilsocket.net\n\n" );
-  
-    parser = optparse.OptionParser( usage = "usage: %prog [options]\n\n" + 
+
+    parser = optparse.OptionParser( usage = "usage: %prog [options]\n\n" +
                                             "EXAMPLE:\n" +
                                             "\t%prog --email your-email@gmail.com --password your-password --name com.arttech.xbugsfree --country \"Italy\" --operator \"3\" --device your-device-id"
     )
-    
+
     parser.add_option( "-e", "--email",    action="store",  dest="email",    default=None, help="Your android account email.")
     parser.add_option( "-p", "--password", action="store",  dest="password", default=None, help="Your android account password.")
     parser.add_option( "-n", "--name",     action="store",  dest="package",  default=None, help="Package identifier ( com.something.name ).")
@@ -43,44 +45,46 @@ def main():
     parser.add_option( "-m", "--devname",  action="store",  dest="devname",  default="passion", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
 
     (o,args) = parser.parse_args()
-  
+
     if o.email is None:
       print("No email specified.")
-      
+
     elif o.password is None:
       print("No password specified.")
-      
+
     elif o.package is None:
       print("No package specified.")
-    
+
     elif o.country is None or o.country not in Operator.OPERATORS:
       print("Empty or invalid country specified, choose from : \n\n" + ", ".join( Operator.OPERATORS.keys() ))
 
     elif o.operator is None or o.operator not in Operator.OPERATORS[ o.country ]:
       print("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ o.country ].keys() ))
-      
+
     elif o.device is None:
       print("No device id specified.")
-    
+
     elif o.sdklevel < 2:
       print("The SDK API level cannot be less than 2.")
-      
+
     else:
       print("@ Logging in ...")
-      
+
       market = Market( o.email, o.password )
       market.login()
-      
+
       print("@ Requesting package ...")
-  
+
       operator = Operator( o.country, o.operator )
       request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
-      asset    = market.get_asset( request.encode() )  
-       
-      print("@ Download %s from :\n  %s" % ( o.package, asset ))
-    
+      (url, market_da)    = market.get_asset( request.encode() )
+
+      print("Downloading...\n")
+
+      Util.download_apk(o.package, url, market_da)
+
 if __name__ == '__main__':
   try:
     main()
   except Exception as e:
-    print(e)
+    print(traceback.format_exc())

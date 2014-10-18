@@ -4,6 +4,6 @@ except:
     import http.client as httplib_compat
 
 try:
-    import urllib.request as urllib_compat
+    import urllib.parse as urllib_parse_compat
 except:
-    import urllib as urllib_compat
+    import urllib as urllib_parse_compat
