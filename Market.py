@@ -28,7 +28,7 @@ class Market:
 
     connection.request("POST", Market.LOGIN_PAGE, params, headers )
 
-    response = connection.getresponse().read()
+    response = str(connection.getresponse().read().decode('UTF-8'))
 
     connection.close()
 
@@ -62,21 +62,21 @@ class Market:
     dl_url    = ""
     dl_cookie = ""
 
-    match = re.search( "(https?:\/\/[^:]+)", response )
+    match = re.search( b"(https?:\/\/[^:]+)", response )
 
     if match is None:
       raise Exception( "Unexpected response." )
 
     else:
-      dl_url = match.group(1)
+      dl_url = match.group(1).decode('utf-8')
 
-    match = re.search( "MarketDA.*?(\d+)", response )
+    match = re.search( b"MarketDA.*?(\d+)", response )
 
     if match is None:
       raise Exception( "Unexpected response." )
 
     else:
-      dl_cookie = match.group(1)
+      dl_cookie = match.group(1).decode('utf-8')
 
     return (dl_url, dl_cookie)
 

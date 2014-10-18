@@ -1,4 +1,5 @@
 import base64
+import binascii
 
 class ProtocolBuffer:
   def __init__( self ):
@@ -41,10 +42,14 @@ class ProtocolBuffer:
     return self.buffer
 
   def finalize( self, b64 = True ):
-    stream = ""
-    for data in self.buffer:
-      stream += chr( data )
-
-    return stream if b64 is False else base64.b64encode( stream, "-_" )
-
+    if not b64:
+        stream = ""
+        for data in self.buffer:
+            stream += chr( data )
+        return stream
+    else:
+        stream_hex = ""
+        for data in self.buffer:
+            stream_hex += ('%02x' % data)
+        return base64.b64encode(binascii.a2b_hex(stream_hex))
 

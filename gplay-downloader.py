@@ -79,7 +79,7 @@ def main():
       request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
       (url, market_da)    = market.get_asset( request.encode() )
 
-      print("Downloading...\n")
+      print("@ Downloading...\n")
 
       Util.download_apk(o.package, url, market_da)
 
