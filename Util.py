@@ -1,5 +1,5 @@
 import os.path
-import pycurl
+from compat import urllib_request_compat
 
 class Util:
     def __init__(self):
@@ -14,10 +14,23 @@ class Util:
             return
 
         with open(filename, 'wb') as f:
-            c = pycurl.Curl()
-            c.setopt(pycurl.URL, url)
-            c.setopt(pycurl.COOKIE, "MarketDA=%s" % market_da)
-            c.setopt(pycurl.NOPROGRESS, 0)
-            c.setopt(pycurl.FOLLOWLOCATION, 1)
-            c.setopt(pycurl.WRITEDATA, f)
-            c.perform()
+            req = Util._create_request(url, market_da)
+            f.write(req.read())
+
+    @staticmethod
+    def download_apk_stream(package, url, market_da):
+        req = Util._create_request(url, market_da)
+        size = req.getheader('Content-Length')
+        def generator():
+            while True:
+                data = req.read(1024)
+                if not len(data):
+                    break
+                yield data
+        return (generator(), size)
+
+    @staticmethod
+    def _create_request(url, market_da):
+        opener = urllib_request_compat.build_opener(urllib_request_compat.HTTPRedirectHandler())
+        opener.addheaders.append(('Cookie', 'MarketDA=%s' % market_da))
+        return opener.open(url)
