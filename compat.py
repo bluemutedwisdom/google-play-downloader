@@ -6,7 +6,7 @@ except:
 try:
     import urllib.parse as urllib_parse_compat
 except:
-    import urlparse as urllib_parse_compat
+    import urllib as urllib_parse_compat
 
 try:
     import urllib.request as urllib_request_compat
