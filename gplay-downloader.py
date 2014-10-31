@@ -41,7 +41,7 @@ def main():
     parser.add_option( "-c", "--country",  action="store",  dest="country",  default=None, help="Your country.")
     parser.add_option( "-o", "--operator", action="store",  dest="operator", default=None, help="Your phone operator.")
     parser.add_option( "-d", "--device",   action="store",  dest="device",   default=None, help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
-    parser.add_option( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", default=9, help="Android SDK API level (default is 9 like Android 2.3.1).")
+    parser.add_option( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", default=19, help="Android SDK API level (default is 19 like Android 4.4).")
     parser.add_option( "-m", "--devname",  action="store",  dest="devname",  default="passion", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
 
     (o,args) = parser.parse_args()
@@ -76,6 +76,7 @@ def main():
       print("@ Requesting package ...")
 
       operator = Operator( o.country, o.operator )
+
       request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
       (url, market_da)    = market.get_asset( request.encode() )
 
