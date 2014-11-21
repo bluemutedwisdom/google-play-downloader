@@ -18,9 +18,9 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-import optparse
 import traceback
 import json
+from ExtendedOptionParser import ExtendedOptionParser
 from Market import Market
 from Operator import Operator
 from AssetRequest import AssetRequest
@@ -31,66 +31,85 @@ def main():
                "\tCopyleft Simone Margaritelli <evilsocket@evilsocket.net>\n" +
                "\thttp://www.evilsocket.net\n\n" );
 
-    parser = optparse.OptionParser( usage = "usage: %prog [options]\n\n" +
-                                            "EXAMPLE:\n" +
-                                            "\t%prog --email your-email@gmail.com --password your-password --name com.arttech.xbugsfree --country \"Italy\" --operator \"3\" --device your-device-id"
-    )
+    defaults = {
+        'email': None,
+        'password': None,
+        'package': None,
+        'country': None,
+        'operator': None,
+        'device': None,
+        'sdklevel': 19,
+        'devname': 'passion'
+    }
 
-    parser.add_option( "-e", "--email",    action="store",  dest="email",    default=None, help="Your android account email.")
-    parser.add_option( "-p", "--password", action="store",  dest="password", default=None, help="Your android account password.")
-    parser.add_option( "-n", "--name",     action="store",  dest="package",  default=None, help="Package identifier ( com.something.name ).")
-    parser.add_option( "-c", "--country",  action="store",  dest="country",  default=None, help="Your country.")
-    parser.add_option( "-o", "--operator", action="store",  dest="operator", default=None, help="Your phone operator.")
-    parser.add_option( "-d", "--device",   action="store",  dest="device",   default=None, help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
-    parser.add_option( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", default=19, help="Android SDK API level (default is 19 like Android 4.4).")
-    parser.add_option( "-m", "--devname",  action="store",  dest="devname",  default="passion", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
-    parser.add_option( "-f", "--config",   action="store",  dest="config",   default="config.json", help="Use settings in the specified config file. All other options are ignore.")
+    usage = """usage: %prog [options]
+
+EXAMPLE:
+    %prog --email your-email@gmail.com --password your-password --name com.arttech.xbugsfree --country "Italy" --operator "3" --device your-device-id
+"""
+    parser = ExtendedOptionParser(defaults=defaults, usage=usage)
+
+    parser.add_option_with_default( "-e", "--email",    action="store",  dest="email",    help="Your android account email.")
+    parser.add_option_with_default( "-p", "--password", action="store",  dest="password", help="Your android account password.")
+    parser.add_option_with_default( "-n", "--name",     action="store",  dest="package",  help="Package identifier ( com.something.name ).")
+    parser.add_option_with_default( "-c", "--country",  action="store",  dest="country",  help="Your country.")
+    parser.add_option_with_default( "-o", "--operator", action="store",  dest="operator", help="Your phone operator.")
+    parser.add_option_with_default( "-d", "--device",   action="store",  dest="device",   help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
+    parser.add_option_with_default( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", help="Android SDK API level (default is 19 like Android 4.4).")
+    parser.add_option_with_default( "-m", "--devname",  action="store",  dest="devname",  help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
+    parser.add_option( "-f", "--config", action="store", dest="config", default=None, help="Load additional settings from the specified config file.")
 
     (o,args) = parser.parse_args()
 
-    if o.config is not None:
-        option_pool = json.loads(open(o.config, 'rb').read().decode('utf-8'))
-        
-    else:
-        option_pool = o
+    option_pool = {}
 
-    if option_pool.email is None:
+    for key in defaults:
+        option_pool[key] = getattr(o, key)
+
+    if o.config is not None:
+        config = json.loads(open(o.config, 'rb').read().decode('utf-8'))
+        for key in config:
+            if key not in option_pool or option_pool[key] is None:
+                # in Python 2.x, json results are unicode
+                option_pool[key] = str(config[key])
+
+    if option_pool['email'] is None:
       print("No email specified.")
 
-    elif option_pool.password is None:
+    elif option_pool['password'] is None:
       print("No password specified.")
 
-    elif option_pool.package is None:
+    elif option_pool['package'] is None:
       print("No package specified.")
 
-    elif option_pool.country is None or option_pool.country not in Operator.OPERATORS:
+    elif option_pool['country'] is None or option_pool['country'] not in Operator.OPERATORS:
       print("Empty or invalid country specified, choose from : \n\n" + ", ".join( Operator.OPERATORS.keys() ))
 
-    elif option_pool.operator is None or option_pool.operator not in Operator.OPERATORS[ option_pool.country ]:
-      print("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ option_pool.country ].keys() ))
+    elif option_pool['operator'] is None or option_pool['operator'] not in Operator.OPERATORS[ option_pool['country'] ]:
+      print("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ option_pool['country'] ].keys() ))
 
-    elif option_pool.device is None:
+    elif option_pool['device'] is None:
       print("No device id specified.")
 
-    elif option_pool.sdklevel < 2:
+    elif option_pool['sdklevel'] < 2:
       print("The SDK API level cannot be less than 2.")
 
     else:
       print("@ Logging in ...")
 
-      market = Market( option_pool.email, option_pool.password )
+      market = Market( option_pool['email'], option_pool['password'] )
       market.login()
 
       print("@ Requesting package ...")
 
-      operator = Operator( option_pool.country, option_pool.operator )
+      operator = Operator( option_pool['country'], option_pool['operator'] )
 
-      request  = AssetRequest( option_pool.package, market.token, option_pool.device, operator, option_pool.devname, option_pool.sdklevel )
+      request  = AssetRequest( option_pool['package'], market.token, option_pool['device'], operator, option_pool['devname'], option_pool['sdklevel'] )
       (url, market_da)    = market.get_asset( request.encode() )
 
       print("@ Downloading...\n")
 
-      Util.download_apk(option_pool.package, url, market_da)
+      Util.download_apk(option_pool['package'], url, market_da)
 
 if __name__ == '__main__':
   try:
