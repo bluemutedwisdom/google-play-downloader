@@ -20,6 +20,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import optparse
 import traceback
+import json
 from Market import Market
 from Operator import Operator
 from AssetRequest import AssetRequest
@@ -43,46 +44,53 @@ def main():
     parser.add_option( "-d", "--device",   action="store",  dest="device",   default=None, help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
     parser.add_option( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", default=19, help="Android SDK API level (default is 19 like Android 4.4).")
     parser.add_option( "-m", "--devname",  action="store",  dest="devname",  default="passion", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
+    parser.add_option( "-f", "--config",   action="store",  dest="config",   default="config.json", help="Use settings in the specified config file. All other options are ignore.")
 
     (o,args) = parser.parse_args()
 
-    if o.email is None:
+    if o.config is not None:
+        option_pool = json.loads(open(o.config, 'rb').read().decode('utf-8'))
+        
+    else:
+        option_pool = o
+
+    if option_pool.email is None:
       print("No email specified.")
 
-    elif o.password is None:
+    elif option_pool.password is None:
       print("No password specified.")
 
-    elif o.package is None:
+    elif option_pool.package is None:
       print("No package specified.")
 
-    elif o.country is None or o.country not in Operator.OPERATORS:
+    elif option_pool.country is None or option_pool.country not in Operator.OPERATORS:
       print("Empty or invalid country specified, choose from : \n\n" + ", ".join( Operator.OPERATORS.keys() ))
 
-    elif o.operator is None or o.operator not in Operator.OPERATORS[ o.country ]:
-      print("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ o.country ].keys() ))
+    elif option_pool.operator is None or option_pool.operator not in Operator.OPERATORS[ option_pool.country ]:
+      print("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ option_pool.country ].keys() ))
 
-    elif o.device is None:
+    elif option_pool.device is None:
       print("No device id specified.")
 
-    elif o.sdklevel < 2:
+    elif option_pool.sdklevel < 2:
       print("The SDK API level cannot be less than 2.")
 
     else:
       print("@ Logging in ...")
 
-      market = Market( o.email, o.password )
+      market = Market( option_pool.email, option_pool.password )
       market.login()
 
       print("@ Requesting package ...")
 
-      operator = Operator( o.country, o.operator )
+      operator = Operator( option_pool.country, option_pool.operator )
 
-      request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
+      request  = AssetRequest( option_pool.package, market.token, option_pool.device, operator, option_pool.devname, option_pool.sdklevel )
       (url, market_da)    = market.get_asset( request.encode() )
 
       print("@ Downloading...\n")
 
-      Util.download_apk(o.package, url, market_da)
+      Util.download_apk(option_pool.package, url, market_da)
 
 if __name__ == '__main__':
   try:
