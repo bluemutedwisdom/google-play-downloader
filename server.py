@@ -1,7 +1,7 @@
 import json
 from flask import Flask, Response
 from Market import Market
-from Operator import Operator
+from OperatorModel import Operator
 from AssetRequest import AssetRequest
 from Util import Util
 app = Flask(__name__)

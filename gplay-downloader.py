@@ -22,7 +22,7 @@ import traceback
 import json
 from ExtendedOptionParser import ExtendedOptionParser
 from Market import Market
-from Operator import Operator
+from OperatorModel import Operator
 from AssetRequest import AssetRequest
 from Util import Util
 
