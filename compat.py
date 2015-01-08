@@ -12,3 +12,8 @@ try:
     import urllib.request as urllib_request_compat
 except:
     import urllib2 as urllib_request_compat
+
+try:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+except ImportError:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
