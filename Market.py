@@ -53,16 +53,22 @@ class Market:
     connection = httplib_compat.HTTPSConnection( Market.API_HOST )
 
     connection.request( "POST", Market.API_PAGE, params, headers )
-    gzipped = connection.getresponse().read()
+    response = connection.getresponse()
+    data = response.read()
+
+    resp_code = response.status
+    if resp_code != httplib_compat.OK:
+        print(data.decode('utf-8'))
+        raise Exception("%d %s" % (resp_code, httplib_compat.responses[resp_code]))
 
     connection.close()
 
-    response = zlib.decompress( gzipped, 16 + zlib.MAX_WBITS )
+    decompressed = zlib.decompress( data, 16 + zlib.MAX_WBITS )
 
     dl_url    = ""
     dl_cookie = ""
 
-    match = re.search( b"(https?:\/\/[^:]+)", response )
+    match = re.search( b"(https?:\/\/[^:]+)", decompressed )
 
     if match is None:
       raise Exception( "Unexpected response." )
@@ -70,7 +76,7 @@ class Market:
     else:
       dl_url = match.group(1).decode('utf-8')
 
-    match = re.search( b"MarketDA.*?(\d+)", response )
+    match = re.search( b"MarketDA.*?(\d+)", decompressed )
 
     if match is None:
       raise Exception( "Unexpected response." )
