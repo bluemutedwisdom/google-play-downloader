@@ -39,7 +39,8 @@ def main():
         'operator': None,
         'device': None,
         'sdklevel': 19,
-        'devname': 'passion'
+        'devname': 'passion',
+        'dry_run': False
     }
 
     usage = """usage: %prog [options]
@@ -57,6 +58,7 @@ EXAMPLE:
     parser.add_option_with_default( "-d", "--device",   action="store",  dest="device",   help="Your device ID ( can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid ) .")
     parser.add_option_with_default( "-s", "--sdklevel", action="store",  type="int", dest="sdklevel", help="Android SDK API level (default is 19 like Android 4.4).")
     parser.add_option_with_default( "-m", "--devname",  action="store",  dest="devname",  help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
+    parser.add_option_with_default( "-t", "--dry-run",  action="store_true", dest="dry_run", help="Test only, a.k.a. dry run")
     parser.add_option( "-f", "--config", action="store", dest="config", default=None, help="Load additional settings from the specified config file.")
 
     (o,args) = parser.parse_args()
@@ -107,9 +109,10 @@ EXAMPLE:
       request  = AssetRequest( option_pool['package'], market.token, option_pool['device'], operator, option_pool['devname'], option_pool['sdklevel'] )
       (url, market_da)    = market.get_asset( request.encode() )
 
-      print("@ Downloading...\n")
+      if not option_pool['dry_run']:
+        print("@ Downloading...\n")
 
-      Util.download_apk(option_pool['package'], url, market_da)
+        Util.download_apk(option_pool['package'], url, market_da)
 
 if __name__ == '__main__':
   try:
