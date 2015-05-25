@@ -1,5 +1,6 @@
 from optparse import OptionParser
 
+
 class ExtendedOptionParser(OptionParser):
     defaults = None
 

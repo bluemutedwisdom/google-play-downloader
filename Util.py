@@ -1,6 +1,7 @@
 import os.path
 from compat import urllib_request_compat
 
+
 class Util:
     def __init__(self):
         pass
@@ -21,6 +22,7 @@ class Util:
     def download_apk_stream(package, url, market_da):
         req = Util._create_request(url, market_da)
         size = req.getheader('Content-Length')
+
         def generator():
             while True:
                 data = req.read(1024)
