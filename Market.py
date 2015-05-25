@@ -1,38 +1,37 @@
-from compat import httplib_compat, urllib_parse_compat
+from compat import urllib_parse_compat, urllib_request_compat
 import re
 import zlib
 
 
 class Market:
-    LOGIN_HOST = "www.google.com"
-    LOGIN_PAGE = "/accounts/ClientLogin"
+    LOGIN_PAGE = "https://www.google.com/accounts/ClientLogin"
     LOGIN_SERVICE = "androidsecure"
     LOGIN_TYPE = "HOSTED_OR_GOOGLE"
-    API_HOST = "android.clients.google.com"
-    API_PAGE = "/market/api/ApiRequest"
+    API_PAGE = "https://android.clients.google.com/market/api/ApiRequest"
 
     def __init__(self, email, password):
         self.email = email
         self.password = password
         self.token = None
+        self._opener = urllib_request_compat.build_opener()
+
+    def _request(self, url, params):
+        encoded_params = urllib_parse_compat.urlencode(params)
+        connection = self._opener.open(url, encoded_params.encode('utf-8'))
+        data = connection.read()
+        return data
 
     def login(self):
-        params = urllib_parse_compat.urlencode({
+        params = {
             "Email": self.email,
             "Passwd": self.password,
             "service": Market.LOGIN_SERVICE,
             "accountType": Market.LOGIN_TYPE
-        })
+        }
 
-        headers = {"Content-type": "application/x-www-form-urlencoded"}
+        data = self._request(Market.LOGIN_PAGE, params)
 
-        connection = httplib_compat.HTTPSConnection(Market.LOGIN_HOST)
-
-        connection.request("POST", Market.LOGIN_PAGE, params, headers)
-
-        response = str(connection.getresponse().read().decode('UTF-8'))
-
-        connection.close()
+        response = str(data.decode('UTF-8'))
 
         if "Error" in response:
             raise Exception("Invalid login credentials.")
@@ -45,25 +44,12 @@ class Market:
             raise Exception("Unexpected response.")
 
     def get_asset(self, request):
-        params = urllib_parse_compat.urlencode({
+        params = {
             "version": 2,
             "request": request
-        })
+        }
 
-        headers = {"Content-type": "application/x-www-form-urlencoded"}
-
-        connection = httplib_compat.HTTPSConnection(Market.API_HOST)
-
-        connection.request("POST", Market.API_PAGE, params, headers)
-        response = connection.getresponse()
-        data = response.read()
-
-        resp_code = response.status
-        if resp_code != httplib_compat.OK:
-            print(data.decode('utf-8'))
-            raise Exception("%d %s" % (resp_code, httplib_compat.responses[resp_code]))
-
-        connection.close()
+        data = self._request(Market.API_PAGE, params)
 
         decompressed = zlib.decompress(data, 16 + zlib.MAX_WBITS)
 
