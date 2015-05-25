@@ -25,11 +25,11 @@ class Market:
         params = {
             "Email": self.email,
             "Passwd": self.password,
-            "service": Market.LOGIN_SERVICE,
-            "accountType": Market.LOGIN_TYPE
+            "service": self.LOGIN_SERVICE,
+            "accountType": self.LOGIN_TYPE
         }
 
-        data = self._request(Market.LOGIN_PAGE, params)
+        data = self._request(self.LOGIN_PAGE, params)
 
         response = str(data.decode('UTF-8'))
 
@@ -49,7 +49,7 @@ class Market:
             "request": request
         }
 
-        data = self._request(Market.API_PAGE, params)
+        data = self._request(self.API_PAGE, params)
 
         decompressed = zlib.decompress(data, 16 + zlib.MAX_WBITS)
 
