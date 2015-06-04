@@ -1,6 +1,6 @@
-from compat import urllib_parse_compat, urllib_request_compat
 import re
 import zlib
+from http_request import http_request
 
 
 class Market:
@@ -13,13 +13,6 @@ class Market:
         self.email = email
         self.password = password
         self.token = None
-        self._opener = urllib_request_compat.build_opener()
-
-    def _request(self, url, params):
-        encoded_params = urllib_parse_compat.urlencode(params)
-        connection = self._opener.open(url, encoded_params.encode('utf-8'))
-        data = connection.read()
-        return data
 
     def login(self):
         params = {
@@ -29,7 +22,7 @@ class Market:
             "accountType": self.LOGIN_TYPE
         }
 
-        data = self._request(self.LOGIN_PAGE, params)
+        data = http_request(self.LOGIN_PAGE, params)
 
         response = str(data.decode('UTF-8'))
 
@@ -49,7 +42,7 @@ class Market:
             "request": request
         }
 
-        data = self._request(self.API_PAGE, params)
+        data = http_request(self.API_PAGE, params)
 
         decompressed = zlib.decompress(data, 16 + zlib.MAX_WBITS)
 

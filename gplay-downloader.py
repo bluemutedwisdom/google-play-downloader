@@ -25,6 +25,7 @@ from Market import Market
 from OperatorModel import Operator
 from AssetRequest import AssetRequest
 from Util import Util
+from http_request import set_default_proxy
 
 
 def main():
@@ -60,6 +61,8 @@ EXAMPLE:
         parser.add_option_with_default("-s", "--sdklevel", action="store", type="int", dest="sdklevel", help="Android SDK API level (default is 19 like Android 4.4).")
         parser.add_option_with_default("-m", "--devname", action="store", dest="devname", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
         parser.add_option_with_default("-t", "--dry-run", action="store_true", dest="dry_run", help="Test only, a.k.a. dry run")
+        parser.add_option_with_default("--proxy", action="store", dest="proxy", default=None, help="Proxy server to use. Use the form user:pass@host:port")
+        parser.add_option_with_default("--proxy-auth-digest", action="store_true", default=None, dest="proxy_auth_digest", help="Use digest authentication in proxies. Default is basic authentication")
         parser.add_option("-f", "--config", action="store", dest="config", default=None, help="Load additional settings from the specified config file.")
 
         (o, args) = parser.parse_args()
@@ -98,6 +101,10 @@ EXAMPLE:
             print("The SDK API level cannot be less than 2.")
 
         else:
+            if option_pool['proxy']:
+                set_default_proxy(
+                    option_pool['proxy'],
+                    'digest' if option_pool['proxy_auth_digest'] else 'basic')
             print("@ Logging in ...")
 
             market = Market(option_pool['email'], option_pool['password'])
