@@ -4,7 +4,7 @@ import zlib
 
 
 class Market:
-    LOGIN_PAGE = "https://www.google.com/accounts/ClientLogin"
+    LOGIN_PAGE = "https://android.clients.google.com/auth"
     LOGIN_SERVICE = "androidsecure"
     LOGIN_TYPE = "HOSTED_OR_GOOGLE"
     API_PAGE = "https://android.clients.google.com/market/api/ApiRequest"
