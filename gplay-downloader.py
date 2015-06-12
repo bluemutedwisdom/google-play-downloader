@@ -40,7 +40,7 @@ def main():
             'country': None,
             'operator': None,
             'device': None,
-            'sdklevel': 19,
+            'sdklevel': '19',
             'devname': 'passion',
             'dry_run': False
         }
@@ -58,7 +58,7 @@ EXAMPLE:
         parser.add_option_with_default("-c", "--country", action="store", dest="country", help="Your country.")
         parser.add_option_with_default("-o", "--operator", action="store", dest="operator", help="Your phone operator.")
         parser.add_option_with_default("-d", "--device", action="store", dest="device", help="Your device ID (can be obtained with this app https://play.google.com/store/apps/details?id=com.redphx.deviceid) .")
-        parser.add_option_with_default("-s", "--sdklevel", action="store", type="int", dest="sdklevel", help="Android SDK API level (default is 19 like Android 4.4).")
+        parser.add_option_with_default("-s", "--sdklevel", action="store", dest="sdklevel", help="Android SDK API level (default is 19 like Android 4.4).")
         parser.add_option_with_default("-m", "--devname", action="store", dest="devname", help="Device name (default 'passion' like HTC Passion aka Google Nexus One.")
         parser.add_option_with_default("-t", "--dry-run", action="store_true", dest="dry_run", help="Test only, a.k.a. dry run")
         parser.add_option_with_default("--proxy", action="store", dest="proxy", default=None, help="Proxy server to use. Use the form user:pass@host:port")
@@ -96,7 +96,7 @@ EXAMPLE:
         elif option_pool['device'] is None:
             print("No device id specified.")
 
-        elif option_pool['sdklevel'] < 2:
+        elif int(option_pool['sdklevel']) < 2:
             print("The SDK API level cannot be less than 2.")
 
         else:
@@ -113,7 +113,7 @@ EXAMPLE:
 
             operator = Operator(option_pool['country'], option_pool['operator'])
 
-            request = AssetRequest(option_pool['package'], market.token, option_pool['device'], operator, option_pool['devname'], option_pool['sdklevel'])
+            request = AssetRequest(option_pool['package'], market.token, option_pool['device'], operator, option_pool['devname'], int(option_pool['sdklevel']))
             (url, market_da) = market.get_asset(request.encode())
 
             if not option_pool['dry_run']:
