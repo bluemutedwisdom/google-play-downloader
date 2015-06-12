@@ -41,7 +41,7 @@ def main():
             'operator': None,
             'device': None,
             'sdklevel': '19',
-            'devname': 'passion',
+            'devname': 'hammerhead',
             'dry_run': False
         }
 
