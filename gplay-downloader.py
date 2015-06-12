@@ -70,14 +70,14 @@ EXAMPLE:
         option_pool = {}
 
         for key in defaults:
-                option_pool[key] = getattr(o, key)
+            option_pool[key] = getattr(o, key)
 
         if o.config is not None:
-                config = json.loads(open(o.config, 'rb').read().decode('utf-8'))
-                for key in config:
-                        if key not in option_pool or option_pool[key] is None:
-                                # in Python 2.x, json results are unicode
-                                option_pool[key] = str(config[key])
+            config = json.loads(open(o.config, 'rb').read().decode('utf-8'))
+            for key in config:
+                if key not in option_pool or option_pool[key] is None:
+                    # in Python 2.x, json results are unicode
+                    option_pool[key] = str(config[key])
 
         if option_pool['email'] is None:
             print("No email specified.")
