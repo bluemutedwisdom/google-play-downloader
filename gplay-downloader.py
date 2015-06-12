@@ -63,7 +63,7 @@ EXAMPLE:
         parser.add_option_with_default("-t", "--dry-run", action="store_true", dest="dry_run", help="Test only, a.k.a. dry run")
         parser.add_option_with_default("--proxy", action="store", dest="proxy", default=None, help="Proxy server to use. Use the form user:pass@host:port")
         parser.add_option_with_default("--proxy-auth-digest", action="store_true", default=None, dest="proxy_auth_digest", help="Use digest authentication in proxies. Default is basic authentication")
-        parser.add_option("-f", "--config", action="store", dest="config", default=None, help="Load additional settings from the specified config file.")
+        parser.add_option("-f", "--config", action="store", dest="config", default=None, help="Load additional settings from the specified config file. Parameters in this file always overwrite command line settings.")
 
         (o, args) = parser.parse_args()
 
@@ -75,9 +75,8 @@ EXAMPLE:
         if o.config is not None:
             config = json.loads(open(o.config, 'rb').read().decode('utf-8'))
             for key in config:
-                if key not in option_pool or option_pool[key] is None:
-                    # in Python 2.x, json results are unicode
-                    option_pool[key] = str(config[key])
+                # in Python 2.x, json results are unicode
+                option_pool[key] = str(config[key])
 
         if option_pool['email'] is None:
             print("No email specified.")
