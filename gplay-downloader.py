@@ -114,12 +114,12 @@ EXAMPLE:
             operator = Operator(option_pool['country'], option_pool['operator'])
 
             request = AssetRequest(option_pool['package'], market.token, option_pool['device'], operator, option_pool['devname'], int(option_pool['sdklevel']))
-            (url, market_da) = market.get_asset(request.encode())
+            url = market.get_asset(request.encode())
 
             if not option_pool['dry_run']:
                 print("@ Downloading...\n")
 
-                Util.download_apk(option_pool['package'], url, market_da)
+                Util.download_apk(option_pool['package'], url)
 
 if __name__ == '__main__':
     try:

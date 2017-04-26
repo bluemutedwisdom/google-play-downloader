@@ -23,14 +23,14 @@ class ApkServerHandler(BaseHTTPRequestHandler):
     def apps(self, appid):
         request = AssetRequest(appid, market.token, config['device'], operator, config['devname'], config['sdklevel'])
         try:
-            url, market_da = market.get_asset(request.encode())
+            url = market.get_asset(request.encode())
         except:
             self.send_response(403)
             self.end_headers()
             self.wfile.write(traceback.format_exc().encode('utf-8'))
             return
 
-        generator, size = Util.download_apk_stream(appid, url, market_da)
+        generator, size = Util.download_apk_stream(appid, url)
 
         self.send_response(200)
         self.send_header('Content-Length', size)

@@ -7,7 +7,7 @@ class Util:
         pass
 
     @staticmethod
-    def download_apk(package, url, market_da):
+    def download_apk(package, url):
         filename = "%s.apk" % package
 
         if os.path.exists(filename):
@@ -15,12 +15,12 @@ class Util:
             return
 
         with open(filename, 'wb') as f:
-            req = Util._create_request(url, market_da)
+            req = Util._create_request(url)
             f.write(req.read())
 
     @staticmethod
-    def download_apk_stream(package, url, market_da):
-        req = Util._create_request(url, market_da)
+    def download_apk_stream(package, url):
+        req = Util._create_request(url)
         size = req.getheader('Content-Length')
 
         def generator():
@@ -32,7 +32,6 @@ class Util:
         return (generator(), size)
 
     @staticmethod
-    def _create_request(url, market_da):
+    def _create_request(url):
         opener = urllib_request_compat.build_opener(urllib_request_compat.HTTPRedirectHandler())
-        opener.addheaders.append(('Cookie', 'MarketDA=%s' % market_da))
         return opener.open(url)
