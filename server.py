@@ -3,12 +3,13 @@ import json
 import re
 import traceback
 from compat import HTTPServer, BaseHTTPRequestHandler
+from constants import defaults
 from Market import Market
 from OperatorModel import Operator
 from AssetRequest import AssetRequest
 from Util import Util
 
-config = None
+config = dict(defaults)
 
 
 class ApkServerHandler(BaseHTTPRequestHandler):
@@ -21,7 +22,7 @@ class ApkServerHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def apps(self, appid):
-        request = AssetRequest(appid, market.token, config['device'], operator, config['devname'], config['sdklevel'])
+        request = AssetRequest(appid, market.token, config['device'], operator, config['devname'], int(config['sdklevel']))
         try:
             url = market.get_asset(request.encode())
         except:
@@ -53,7 +54,7 @@ class ApkServerHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     try:
         with open('config.json', 'rb') as f:
-            config = json.loads(f.read().decode('utf-8'))
+            config.update(json.loads(f.read().decode('utf-8')))
     except:
         print('Unable to load config file')
         sys.exit(1)

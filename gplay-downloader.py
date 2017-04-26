@@ -20,6 +20,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import traceback
 import json
+from constants import defaults
 from ExtendedOptionParser import ExtendedOptionParser
 from Market import Market
 from OperatorModel import Operator
@@ -32,18 +33,6 @@ def main():
         print("\n\tGooglePlay Downloader - Directly download apks from GooglePlay to your PC.\n" +
               "\tCopyleft Simone Margaritelli <evilsocket@evilsocket.net>\n" +
               "\thttp://www.evilsocket.net\n\n")
-
-        defaults = {
-            'email': None,
-            'password': None,
-            'package': None,
-            'country': None,
-            'operator': None,
-            'device': None,
-            'sdklevel': '19',
-            'devname': 'hammerhead',
-            'dry_run': False
-        }
 
         usage = """usage: %prog [options]
 
