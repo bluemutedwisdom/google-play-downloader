@@ -1,0 +1,2 @@
+# This file contains apps that can't be downloaded via this script
+eu.chainfire.supersu.pro
