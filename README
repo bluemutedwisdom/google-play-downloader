@@ -1,3 +1,10 @@
+NOTICE:
+
+While this script might still work, it hasn't been maintained for the last 7 years.
+For a more recent alternative, try https://github.com/matlink/gplaycli.
+
+---
+
 GooglePlay Downloader - Directly download apks from GooglePlay to your PC.
 by Simone Margaritelli aka evilsocket
 <evilsocket@gmail.com - http://www.evilsocket.net>
