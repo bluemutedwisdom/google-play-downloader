@@ -18,7 +18,8 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-import httplib, urllib, base64, zlib, re, optparse
+import urllib, base64, zlib, re, optparse
+import http.client as httplib
 
 class Market:
   LOGIN_HOST    = "www.google.com"
@@ -34,7 +35,7 @@ class Market:
     self.token    = None
   
   def login( self ):			
-    params = urllib.urlencode({
+    params = urllib.parse.urlencode({
       "Email"       : self.email,
       "Passwd"      : self.password,
       "service"     : Market.LOGIN_SERVICE,
@@ -62,7 +63,7 @@ class Market:
       raise Exception( "Unexpected response." )
       
   def get_asset( self, request ):
-    params = urllib.urlencode({
+    params = urllib.parse.urlencode({
       "version" : 2,
       "request" : request
     })
@@ -389,39 +390,39 @@ if __name__ == '__main__':
     (o,args) = parser.parse_args()
   
     if o.email is None:
-      print "No email specified." 
+      print("No email specified.") 
       
     elif o.password is None:
-      print "No password specified." 
+      print ("No password specified.") 
       
     elif o.package is None:
-      print "No package specified." 
+      print ("No package specified.") 
     
     elif o.country is None or o.country not in Operator.OPERATORS:
-      print "Empty or invalid country specified, choose from : \n\n" + ", ".join( Operator.OPERATORS.keys() )
+      print ("Empty or invalid country specified, choose from : \n\n" + ", ".join( Operator.OPERATORS.keys()))
 
     elif o.operator is None or o.operator not in Operator.OPERATORS[ o.country ]:
-      print "Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ o.country ].keys() )
+      print ("Empty or invalid operator specified, choose from : \n\n" + ", ".join( Operator.OPERATORS[ o.country ].keys()))
       
     elif o.device is None:
-      print "No device id specified." 
+      print ("No device id specified.")
     
     elif o.sdklevel < 2:
-      print "The SDK API level cannot be less than 2."
+      print ("The SDK API level cannot be less than 2.")
       
     else:
-      print "@ Logging in ..."
+      print ("@ Logging in ...")
       
       market = Market( o.email, o.password )
       market.login()
       
-      print "@ Requesting package ..."
+      print ("@ Requesting package ...")
   
       operator = Operator( o.country, o.operator )
       request  = AssetRequest( o.package, market.token, o.device, operator, o.devname, o.sdklevel )
       asset    = market.get_asset( request.encode() )  
        
-      print "@ Download %s from :\n  %s" % ( o.package, asset )
+      print ("@ Download %s from :\n  %s" % ( o.package, asset ))
     
   except Exception as e:
-    print e
+    print(e)
